@@ -233,8 +233,8 @@ def knight_details(name):
     knight_descriptions[name] = gen_knight_desc(name)
 
 # TODO Handle names of multiple words e.g. Albert the Great
-# Create a new entry in the 'knights' dict
 def create_knight():
+    # Create a new entry in the 'knights' dict
     print("Let's make a knight")
     # Names are stored in lowercase
     name = prompt("Please enter the knights name:").lower()
@@ -297,7 +297,10 @@ def delete_knights(selection):
         knight_to_file('dead_knights.txt', knight_descriptions.pop(kn))
         if kn in glorious_scrolls: glorious_scrolls.pop(kn)
 
-######################################## Knight Printing Functions ########################################
+######################################## Knight Describing Functions ########################################
+
+#TODO Allow for the description of only certain characteristics of the knights selected
+# e.g just their weapons or just their castles
 
 # Used to generate the description dictionary for an individual knight
 def gen_knight_desc(k_name):
@@ -417,6 +420,7 @@ def get_knights(lines):
     return kns
 
 # TODO allow for names with multiple words in them
+# TODO Add error handling for files with incorrect formatting
 def retrieve_details(kn):
     kn = [line.split() for line in kn]
 
