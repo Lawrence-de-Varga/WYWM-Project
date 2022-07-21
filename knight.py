@@ -320,14 +320,6 @@ def gen_knight_desc(k_name):
 
     return desc_dict
 
-# Only used for testing, in practice the descriptions will be generated when the knight is created
-# Used to collect the description lists for all or some of the knights
-def gen_knights_descs():
-    for knight in knights.keys():
-        knight_descriptions[knight] = gen_knight_desc(knight)
-    return knight_descriptions
-
-
 # by default prints the format string, pass False to return the string
 def format_k_desc(k_desc, prn=True):
     format_string = ""
@@ -338,8 +330,29 @@ def format_k_desc(k_desc, prn=True):
     else:
         return format_string
 
+def access_attribute(k_desc, attribute, prn=True):
+    if prn:
+        print(k_desc[attribute])
+        print() 
+    else:   
+        return k_desc[attribute]
+
 def prnKD(k_desc):
     format_k_desc(k_desc)
+
+def describe_knight(knight):
+    print(f"Describing: {knight.capitalize()}")
+    attributes = so_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
+    if 'exit' in attributes:
+        return
+    if {'character', 'weapon', 'activities', 'castle'} == set(attributes):
+        return prnKD(knight_descriptions[knight])
+    else:
+        for attr in attributes:
+            print(f"{knight.capitalize()}'s {attr}:")
+            access_attribute(knight_descriptions[knight], attr)
+
+
 
 # Prints the description string for an arbitrary selection of knights
 #describe_knights = should_i_exit(
@@ -347,7 +360,15 @@ def prnKD(k_desc):
 def describe_knights(selection):
 
     for knight in selection:
-        prnKD(knight_descriptions[knight])
+        describe_knight(knight)
+#        prnKD(knight_descriptions[knight])
+
+# Only used for testing, in practice the descriptions will be generated when the knight is created
+# Used to collect the description lists for all or some of the knights
+def gen_knights_descs():
+    for knight in knights.keys():
+        knight_descriptions[knight] = gen_knight_desc(knight)
+    return knight_descriptions
 
 ####################################### Writing Knights to File ###############################################
 
