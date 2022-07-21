@@ -70,13 +70,16 @@ def set_article(adjective):
 
 ####################################### Decorator Functions ###################################################
 
+# TODO Currently Broken
 # A number of functions need to check whether or not knights or some other dict or list is empty
 # and whether or not they have been passed 'exit' as input by the user, the decorator below 
 # keeps that code out of those functions
 def should_i_exit(objects):
     def func_wrapper(function):
         def wrapper(*args, **kwargs):
-            if not objects or 'exit' in args:
+            print(args)
+            print(list(args))
+            if not objects or 'exit' in args[0]:
                 return
             else:
                 return function(*args, **kwargs)
@@ -259,6 +262,7 @@ def create_knight():
 def update_knight(knight):
     print(f"Updating {knight.capitalize()}.")
     attrs = so_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
+    print(attrs)
 
     if 'exit' in attrs:
         return
