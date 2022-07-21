@@ -440,17 +440,19 @@ def get_knights(lines):
 
 # TODO allow for names with multiple words in them
 # TODO Add error handling for files with incorrect formatting
+# Takes the 4 string lists from which are returned as elements of a list from get_knights
+# and extracts the info necessary to rebuild the description for further use.
 def retrieve_details(kn):
     kn = [line.split() for line in kn]
 
-    name = kn[0][0]
-    age = kn[0][4]
-    castle = list_to_string(kn[3][8:-9])
-    weapon = list_to_string(kn[1][6:])
-    char_adj = kn[0][3]
+    name = ' '.join(kn[0][:-7])
+    age = kn[0][-4]
+    castle = ' '.join(kn[3][8 + len(name.split()) - 1:]).split('.')[0]
+    weapon = ' '.join(kn[1][6:])[:-1]
+    char_adj = kn[0][-5]
     weapon_adj = kn[1][5]
-    activity = list_to_string(kn[2][8:])
-    castle_adj = kn[3][4]
+    activity = list_to_string(kn[2][7 + len(name.split()):])
+    castle_adj = kn[3][4 + len(name.split()) -1]
 
     knights[name] = {'age': age, 'weapon' : weapon, 'castle' : castle, 
                      'adjs' : [weapon_adj, castle_adj, char_adj, activity]}
