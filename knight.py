@@ -77,9 +77,7 @@ def set_article(adjective):
 def should_i_exit(objects):
     def func_wrapper(function):
         def wrapper(*args, **kwargs):
-            print(args)
-            print(list(args))
-            if not objects or 'exit' in args[0]:
+            if not objects or 'exit' in *args:
                 return
             else:
                 return function(*args, **kwargs)
@@ -262,7 +260,6 @@ def create_knight():
 def update_knight(knight):
     print(f"Updating {knight.capitalize()}.")
     attrs = so_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
-    print(attrs)
 
     if 'exit' in attrs:
         return
