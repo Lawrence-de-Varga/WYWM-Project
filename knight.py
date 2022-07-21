@@ -171,20 +171,22 @@ def select_options(options_to_select, object_name, action_name):
         # Removes 'exit' and 'all' from the return list
         options_to_return = list(options_to_select.values())
         del options_to_return[-2:]
-        return first_words(options_to_return)
+        return options_to_return
 
     # returns a list with every option selected by the user in its word form
     # as the words are used as keys later on
     for option in selection:
         if option in options_to_select.keys():
-            options_to_return.append(options_to_select[option])
+            options_to_return.append(first_word(options_to_select[option]))
         elif option in options_to_select.values():
+            options_to_return.append(option)
+        elif option in first_words(options_to_select.values()):
             options_to_return.append(option)
         else:
             print("Bad input.")
             return select_options(options_to_select, object_name, action_name)
-
-    return first_words(options_to_return)
+    print(f"Options to return: {options_to_return}")
+    return options_to_return
 
 # so_wrap is a wrapper for select_options(print_options(gen_options etc))
 # go_n and ga_n are usuually the same as so_n and sa_n respectively, but on rare
