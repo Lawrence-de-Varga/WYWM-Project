@@ -148,6 +148,8 @@ def format_input(selection_string):
     new_str = [option.strip().lower() for option in new_str]
     return new_str
 
+# TODO Review the use of first_words and first_word, I have bodged it to work for now
+# But it may not be necessary
 # Select_options takes a dictionary of the form returned by gen_options, asks the user to choose an option
 # or options using either the name of the option or its list number, it then returns a list containing
 # all of the options selected in their word form e.g. if the options are {'1':'a','2':'b','3':'c'}
@@ -159,10 +161,9 @@ def select_options(options_to_select, object_name, action_name):
 
     selection = prompt(f"Which {object_name} would you like to {action_name}?")
     selection = format_input(selection)
-#    selection = [str.lower().strip() for str in selection]
     options_to_return = []
-    print(f"Options to select: {options_to_select}")
-    print(f"Selection: {selection}")
+#    print(f"Options to select: {options_to_select}")
+#    print(f"Selection: {selection}")
 
     # If the user selects 'all' we return a list containg every available option
     # except for 'all' and 'exit'
@@ -177,15 +178,13 @@ def select_options(options_to_select, object_name, action_name):
     # as the words are used as keys later on
     for option in selection:
         if option in options_to_select.keys():
-            options_to_return.append(first_word(options_to_select[option]))
+            options_to_return.append(options_to_select[option])
         elif option in options_to_select.values():
-            options_to_return.append(option)
-        elif option in first_words(options_to_select.values()):
             options_to_return.append(option)
         else:
             print("Bad input.")
             return select_options(options_to_select, object_name, action_name)
-    print(f"Options to return: {options_to_return}")
+#    print(f"Options to return: {options_to_return}")
     return options_to_return
 
 # so_wrap is a wrapper for select_options(print_options(gen_options etc))
@@ -457,17 +456,19 @@ def ressurect_knights(file):
 #################################################### Main Menu #################################################
 
 def menu():
-    menu_ops = ['create a knight','update a knight','describe the knights',
-                'execute a disloyal knight', 'record some grand knights in the scrolls', 
+    menu_ops = ['create a knight','update some knights','describe some knights',
+                'execute some knights', 'record some grand knights in the scrolls', 
                 'erase some troublesome knights from the scrolls', 'ressurect knights from the dead']
     print()
     print('########## MAIN MENU ##########')
     print()
-    
-    action = so_wrap(menu_ops, 'action', 'take', every = False)
+   
+    options = print_options(gen_options(menu_ops, 'action', 'take', every=False))
+    for key, val in options.items():
+        options[key] = first_word(val)
 
-    # TODO entering 'create' or any other word is not working currently. 
-    # FIX 
+    action = select_options(options, 'action', 'take')
+
     if action[0] == 'create':
         create_knight()
         menu()
