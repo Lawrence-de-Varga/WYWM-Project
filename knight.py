@@ -103,17 +103,6 @@ def gen_options_dict(range_of_dict, options):
 
     return dict(zip(string_range, options))
 
-# Prints the menu options in a numbered list and returns options_dict to pass to select_options
-def print_options(options_dict):
-    if not options_dict:
-        return False
-
-    for x, option in options_dict.items():
-        print(f"{x}: {option.capitalize()}")
-
-    print()
-    return options_dict
-
 # takes a list of menu options and returns a dictionary of the form returned by gen_options_dict
 # also adds the 'all' and 'exit' option to all menus by default
 def gen_options(options_list, object_name, action_name, every=True, esc=True):
@@ -127,6 +116,17 @@ def gen_options(options_list, object_name, action_name, every=True, esc=True):
         options_list = options_list +  ['exit']
 
     return gen_options_dict(range(1, 1 + len(options_list)), options_list)
+
+# Prints the menu options in a numbered list and returns options_dict to pass to select_options
+def print_options(options_dict):
+    if not options_dict:
+        return False
+
+    for x, option in options_dict.items():
+        print(f"{x}: {option.capitalize()}")
+
+    print()
+    return options_dict
 
 def format_input(selection_string):
     """ Takes any string given by the user, removes extraneous spaces, splits the string
@@ -159,7 +159,7 @@ def select_options(options_to_select, object_name, action_name):
     if not options_to_select: 
         return False 
 
-    selection = prompt(f"Which {object_name} would you like to {action_name}?")
+    selection = prompt(f"Which {object_name} would you like to {action_name}? (Please seperate options with commas.)")
     selection = format_input(selection)
     options_to_return = []
 #    print(f"Options to select: {options_to_select}")
@@ -233,7 +233,7 @@ def knight_details(name):
 
     knight_descriptions[name] = gen_knight_desc(name)
 
-# TODO Handle names of multiple words e.g. Albert the Great
+# TODO Maintain the capitalization of names such as Albert the Great
 def create_knight():
     # Create a new entry in the 'knights' dict
     print("Let's make a knight")
@@ -254,8 +254,8 @@ def create_knight():
     else:
         knight_details(name)
 
-# Updates an individual knight, if the name is changed the knights and knight_descriptions dictionaries 
-# are modified 
+# Updates an individual knight, and geenrates a new description,
+# if the name is changed the knights and knight_descriptions dictionaries are modified 
 def update_knight(knight):
     print(f"Updating {knight.capitalize()}.")
     attrs = so_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
@@ -280,7 +280,7 @@ def update_knight(knight):
     knight_descriptions[knight] = gen_knight_desc(knight)
     return knight
 
-# Updates multiple knights and generates new descriptions for them
+# Updates multiple knights 
 @should_i_exit(knights)
 def update_knights(selection):
 
@@ -299,9 +299,6 @@ def delete_knights(selection):
         if kn in glorious_scrolls: glorious_scrolls.pop(kn)
 
 ######################################## Knight Describing Functions ########################################
-
-#TODO Allow for the description of only certain characteristics of the knights selected
-# e.g just their weapons or just their castles
 
 # Used to generate the description dictionary for an individual knight
 def gen_knight_desc(k_name):
