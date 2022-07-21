@@ -76,7 +76,7 @@ def set_article(adjective):
 def should_i_exit(objects):
     def func_wrapper(function):
         def wrapper(*args, **kwargs):
-            if not objects or 'exit' in *args:
+            if not objects or 'exit' in args[0]:
                 return
             else:
                 return function(*args, **kwargs)
