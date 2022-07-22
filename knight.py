@@ -273,7 +273,7 @@ def create_knight():
 
 # Updates an individual knight, and geenrates a new description,
 # if the name is changed the knights and knight_descriptions dictionaries are modified 
-def update_knight(knight):
+def update_knight(name):
     print(f"Updating {format_name(name)}.")
     attrs = so_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
 
@@ -310,20 +310,20 @@ def update_knights(selection):
 def delete_knights(selection):
     erase_knights(selection)
 
-    for kn in selection:
+    for name in selection:
         print(f"Executing {format_name(name)}.")
-        knights.pop(kn)
-        knight_to_file('dead_knights.txt', knight_descriptions.pop(kn))
-        if kn in glorious_scrolls: glorious_scrolls.pop(kn)
+        knights.pop(name)
+        knight_to_file('dead_knights.txt', knight_descriptions.pop(name))
+        if name in glorious_scrolls: glorious_scrolls.pop(name)
 
 ######################################## Knight Describing Functions ########################################
 
 # Used to generate the description dictionary for an individual knight
-def gen_knight_desc(k_name):
-    info = knights[k_name]
+def gen_knight_desc(name):
+    info = knights[name]
     adjs = info['adjs']
     desc_dict = {}
-    name = format_name(k_name)
+    name = format_name(name)
 
     desc_dict['character'] = f"{name} is {set_article(adjs[2])} {info['age']} year old knight."
     desc_dict['weapon'] = f"In battle he favours his {adjs[0]} {info['weapon']}."
@@ -355,17 +355,17 @@ def access_attribute(k_desc, attribute, prn=True):
 def prnKD(k_desc):
     format_k_desc(k_desc)
 
-def describe_knight(knight):
+def describe_knight(name):
     print(f"Describing: {format_name(name)}")
     attributes = so_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
     if 'exit' in attributes:
         return
     if {'character', 'weapon', 'activities', 'castle'} == set(attributes):
-        return prnKD(knight_descriptions[knight])
+        return prnKD(knight_descriptions[name])
     else:
         for attr in attributes:
             print(f"{format_name(name)}'s {attr}:")
-            access_attribute(knight_descriptions[knight], attr)
+            access_attribute(knight_descriptions[name], attr)
 
 
 
