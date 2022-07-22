@@ -282,20 +282,20 @@ def update_knight(name):
 
     if 'name' in attrs:
         new_name = prompt(f"What would you like {format_name(name)}'s new name to be?")
-        knights[new_name] = knights[knight]
-        knights.pop(knight)
-        knight_descriptions.pop(knight)
-        knight = new_name
+        knights[new_name] = knights[name]
+        knights.pop(name)
+        knight_descriptions.pop(name)
+        name = new_name
 
     for attr in attrs:
         if attr == 'name':
             continue
         new_val = prompt(f"What would you like {format_name(name)}'s new {attr} to be?")
 
-        knights[knight][attr] = new_val
+        knights[name][attr] = new_val
 
-    knight_descriptions[knight] = gen_knight_desc(knight)
-    return knight
+    knight_descriptions[name] = gen_knight_desc(name)
+    return name
 
 # Updates multiple knights 
 @should_i_exit(knights)
