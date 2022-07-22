@@ -68,11 +68,28 @@ def set_article(adjective):
     else:
         return f"a {adjective}"
 
+# Takes a name like 'albert the great' and returns 'Albert the Great'
+# NOTE articles_and_others is not necessarily complete  
+articles_and_others = ['the', 'a', 'an', 'and', 'on', 'in', 'of']
+def format_name(name):
+    name = name.split()
+    new_name = []
+    for word in name:
+        if word in articles_and_others:
+            new_name.append(word)
+        else:
+            new_name.append(word.capitalize())
+    return ' '.join(new_name)
+
 ####################################### Decorator Functions ###################################################
 
 # A number of functions need to check whether or not knights or some other dict or list is empty
 # and whether or not they have been passed 'exit' as input by the user, the decorator below 
 # keeps that code out of those functions
+# NOTE for myself applying should_i_exit to a function with the @should_i_exit syntax is equivalent to 
+# decorated_func = should_i_exit(objects)(decorated_func) for example with update_knights
+# update_knights = should_i_exit(knights)(update_knights)
+# Which then reduces to update_knights = func_wrapper(update_knights)
 def should_i_exit(objects):
     def func_wrapper(function):
         def wrapper(*args, **kwargs):
@@ -208,7 +225,7 @@ def knight_details(name):
 
     knights[name] = {}
 
-    age = prompt(f'How old is {name.capitalize()}?')
+    age = prompt(f'How old is {format_name(name)}?')
     try:
         int(age)
         knights[name]['age'] = age
@@ -216,10 +233,10 @@ def knight_details(name):
         print("Please enter an integer for the age.")
         return knight_details(name)
 
-    weapon = prompt(f'What weapon does {name.capitalize()} favour?').lower()
+    weapon = prompt(f'What weapon does {format_name(name)} favour?').lower()
     knights[name]['weapon'] = weapon
 
-    castle = prompt(f"What is the name of {name.capitalize()}'s castle?")
+    castle = prompt(f"What is the name of {format_name(name)}'s castle?")
     knights[name]['castle'] = castle
 
     # sets an unchanging group of adjectives used to enliven the descriptions of the knight
@@ -241,8 +258,8 @@ def create_knight():
     name = prompt("Please enter the knights name:").lower()
 
     if name in knights:
-        print(f"{name.capitalize()} is already a knight.")
-        selection = so_wrap([f'overwrite {name.capitalize()}', f'update {name.capitalize()}'], 'action', 'take', every=False)
+        print(f"{format_name(name)} is already a knight.")
+        selection = so_wrap([f'overwrite {format_name(name)}', f'update {format_name(name)}'], 'action', 'take', every=False)
         if 'overwrite' in selection:
             knights[name] = {}
             knight_details(name)
@@ -257,14 +274,14 @@ def create_knight():
 # Updates an individual knight, and geenrates a new description,
 # if the name is changed the knights and knight_descriptions dictionaries are modified 
 def update_knight(knight):
-    print(f"Updating {knight.capitalize()}.")
+    print(f"Updating {format_name(name)}.")
     attrs = so_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
 
     if 'exit' in attrs:
         return
 
     if 'name' in attrs:
-        new_name = prompt(f"What would you like {knight.capitalize()}'s new name to be?")
+        new_name = prompt(f"What would you like {format_name(name)}'s new name to be?")
         knights[new_name] = knights[knight]
         knights.pop(knight)
         knight_descriptions.pop(knight)
@@ -273,7 +290,7 @@ def update_knight(knight):
     for attr in attrs:
         if attr == 'name':
             continue
-        new_val = prompt(f"What would you like {knight.capitalize()}'s new {attr} to be?")
+        new_val = prompt(f"What would you like {format_name(name)}'s new {attr} to be?")
 
         knights[knight][attr] = new_val
 
@@ -287,13 +304,14 @@ def update_knights(selection):
     for knight in selection:
         new_knight = update_knight(knight)
 
+
 # Deletes an arbitrary selection of knights
 @should_i_exit(knights)
 def delete_knights(selection):
     erase_knights(selection)
 
     for kn in selection:
-        print(f"Executing {kn.capitalize()}.")
+        print(f"Executing {format_name(name)}.")
         knights.pop(kn)
         knight_to_file('dead_knights.txt', knight_descriptions.pop(kn))
         if kn in glorious_scrolls: glorious_scrolls.pop(kn)
@@ -305,7 +323,7 @@ def gen_knight_desc(k_name):
     info = knights[k_name]
     adjs = info['adjs']
     desc_dict = {}
-    name = k_name.capitalize()
+    name = format_name(k_name)
 
     desc_dict['character'] = f"{name} is {set_article(adjs[2])} {info['age']} year old knight."
     desc_dict['weapon'] = f"In battle he favours his {adjs[0]} {info['weapon']}."
@@ -313,7 +331,7 @@ def gen_knight_desc(k_name):
     desc_dict['activities'] = f"{name} can usually be found waging war or {adjs[3]}."
     # TODO Add random adjectives to replace 'grand' in the castle string
     desc_dict['castle'] = (f"{name} resides in the {adjs[1]} castle known as " 
-                          f"{info['castle'].capitalize()}. Its furnishings are as grand as he is {adjs[2]}.")
+                          f"{format_name(info['castle'])}. Its furnishings are as grand as he is {adjs[2]}.")
 
     return desc_dict
 
@@ -338,7 +356,7 @@ def prnKD(k_desc):
     format_k_desc(k_desc)
 
 def describe_knight(knight):
-    print(f"Describing: {knight.capitalize()}")
+    print(f"Describing: {format_name(name)}")
     attributes = so_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
     if 'exit' in attributes:
         return
@@ -346,7 +364,7 @@ def describe_knight(knight):
         return prnKD(knight_descriptions[knight])
     else:
         for attr in attributes:
-            print(f"{knight.capitalize()}'s {attr}:")
+            print(f"{format_name(name)}'s {attr}:")
             access_attribute(knight_descriptions[knight], attr)
 
 
