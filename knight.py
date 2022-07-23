@@ -3,11 +3,11 @@ from random import choice
 ########################## Data for Program ######################################################################
 
 # Knights for testing
-#knights = {'john': {'age': '23', 'weapon': 'mace', 'castle': 'london',
-#                    'adjs': ['trusty', 'foreboding', 'impoverished', 'whoremongering']},
-#           'james': {'age': '24', 'weapon': 'lance', 'castle': 'paris',
-#                     'adjs': ['venerable', 'decrepit', 'loyal', 'hunting']}}
-knights = {}
+knights = {'john': {'age': '23', 'weapon': 'mace', 'castle': 'london',
+                    'adjs': ['trusty', 'foreboding', 'impoverished', 'whoremongering']},
+           'james': {'age': '24', 'weapon': 'lance', 'castle': 'paris',
+                     'adjs': ['venerable', 'decrepit', 'loyal', 'hunting']}}
+#knights = {}
 
 weapon_adjs = ['trusty', 'venerable', 'vicious', 'blood-thirsty', 'gleaming', 'rusty', 'notched']
 
@@ -114,11 +114,9 @@ def should_i_exit(objects):
 ############################################ Menu Presentation and Selection #################################
 
 def first_word(string):
-     """Used to retrieve the first string from a menu option presented to the user. This string is then checked
-         against the user input to see what option they have chosen. This allows a longer option
-         description to be presented to the user, whilst they only have to type in the first key word e.g.
-         if 'Create a knight' is presented, the can type 'create'"""
-    return string.split(' ', 1)[0]
+     """ Used to retrieve the first string from a menu option presented to the user. This string is then checked
+         against the user input to see what option they have chosen."""
+     return string.split(' ', 1)[0]
 
 
 def first_words(options):
@@ -320,7 +318,7 @@ def update_knight(name):
 def update_knights(selection):
     """ Updates multiple knights"""
     for name in selection:
-        update_knight(knight)
+        update_knight(name)
 
 
 @should_i_exit(knights)
@@ -355,7 +353,7 @@ def gen_knight_desc(name):
     return desc_dict
 
 
-def access_knight_descriptiom(knight_description, prn=True):
+def access_knight_description(knight_description, prn=True):
     """ By default prints the full knight description, pass False to return the description."""
     format_string = ""
     for attr in knight_description.values():
@@ -379,10 +377,11 @@ def describe_knight(name):
     """ Allows the user to select which attributes of a knight to describe."""
     print(f"Describing: {format_name(name)}")
     attributes = select_options_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
+    description = []
     if 'exit' in attributes:
         return
     if {'character', 'weapon', 'activities', 'castle'} == set(attributes):
-        return print_knight_description(knight_descriptions[name])
+        return access_knight_description(knight_descriptions[name])
     else:
         for attr in attributes:
             print(f"{format_name(name)}'s {attr}:")
@@ -392,6 +391,7 @@ def describe_knight(name):
 @should_i_exit(knight_descriptions)
 def describe_knights(selection):
     """ Calls describe_knight on all the knights in selection."""
+    
     for name in selection:
         describe_knight(name)
 
@@ -446,14 +446,6 @@ def erase_knights(selection):
 
 # TODO allow for the selection of particular knights from the file rather than just grabbing all of them
 
-# Used to allow for retrieval of items made up of two or more words i.e 'battle axe'
-#def list_to_string(lst):
-#    string = ""
-#    for item in lst:
-#        string += (item.strip() + ' ')
-#    return string.strip()[:-1]
-
-
 def read_knights(file):
     """ Reads in the entire file ('knights.txt') and returns the list."""
     with open(file, 'r') as f:
@@ -488,21 +480,21 @@ def retrieve_details(kn):
     castle = ' '.join(kn[3][8 + len(name.split()) - 1:]).split('.')[0]
     weapon = ' '.join(kn[1][6:])[:-1]
     char_adj = kn[0][-5]
-    if char_adj not in knight_adjs:
-        print("Corrupt input file.")
-        return False
+#    if char_adj not in knight_adjs:
+#        print("Corrupt input file.")
+#        return False
     weapon_adj = kn[1][5]
-    if weapon_adj not in weapon_adjs:
-        print("Corrupt input file.")
-        return False
-    activity = ' '.join(kn[2][7 + len(name.split()):])
-    if activity not in knight_activities:
-        print("Corrupt input file.")
-        return False
+#    if weapon_adj not in weapon_adjs:
+#        print("Corrupt input file.")
+#        return False
+    activity = ' '.join(kn[2][7 + len(name.split()):])[:-1]
+#    if activity not in knight_activities:
+#        print("Corrupt input file.")
+#        return False
     castle_adj = kn[3][4 + len(name.split()) - 1]
-    if castle_adj not in castle_adjs:
-        print("Corrupt input file.")
-        return False
+#    if castle_adj not in castle_adjs:
+#        print("Corrupt input file.")
+#        return False
 
     knights[name] = {'age': age, 'weapon': weapon, 'castle': castle,
                      'adjs': [weapon_adj, castle_adj, char_adj, activity]}
@@ -513,8 +505,8 @@ def retrieve_knights(kns):
     """ Takes the list from get_knights and extracts the details needed to generate entries for 'knights',
          and 'knight_descriptions' by using retrieve_details as above."""
     for name in kns:
-        retrieve_details(knight)
-    return knights
+        retrieve_details(name)
+#    return knights
 
 
 def resurrect_knights(file):
@@ -577,5 +569,5 @@ def menu():
 
 
 # gen_knights_descs() is only for testing
-#gen_knights_descs()
+gen_knights_descs()
 menu()
