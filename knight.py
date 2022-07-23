@@ -74,7 +74,7 @@ def set_article(adjective):
 
 # Takes a name like 'albert the great' and returns 'Albert the Great'
 # NOTE articles_and_others is not necessarily complete  
-articles_and_others = ['the', 'a', 'an', 'and', 'on', 'in', 'of']
+articles_and_others = ['the', 'a', 'an', 'and', 'on', 'in', 'of', 'some', 'from']
 
 
 def format_name(name):
@@ -96,7 +96,6 @@ def format_name(name):
 # decorated_func = should_i_exit(objects)(decorated_func) for example with update_knights
 # update_knights = should_i_exit(knights)(update_knights)
 # Which then reduces to update_knights = func_wrapper(update_knights)
-@debug
 def should_i_exit(objects):
     """ A number of functions need to check whether knights or some other dict or list is empty
          and whether they have been passed 'exit' as input by the user, the decorator below
@@ -402,7 +401,6 @@ def knight_to_file(file, knight_description):
         f.write('\n')
 
 
-@debug
 @should_i_exit(knights)
 def knights_to_file(selection, file):
     """ Writes an arbitrary selection of knights to a file"""
