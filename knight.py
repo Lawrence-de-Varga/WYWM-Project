@@ -477,25 +477,26 @@ def retrieve_details(kn):
 
     name = ' '.join(kn[0][:-7])
     age = kn[0][-4]
-    castle = ' '.join(kn[3][8 + len(name.split()) - 1:]).split('.')[0]
     weapon = ' '.join(kn[1][6:])[:-1]
-    char_adj = kn[0][-5]
-    if char_adj not in knight_adjs:
-#        print("Corrupt input file.")
-        return False
+    castle = ' '.join(kn[3][8 + len(name.split()) - 1:]).split('.')[0]
+
     weapon_adj = kn[1][5]
     if weapon_adj not in weapon_adjs:
-#        print("Corrupt input file.")
         return False
-    activity = ' '.join(kn[2][7 + len(name.split()):])[:-1]
-    if activity not in knight_activities:
-#        print("Corrupt input file.")
-        return False
+
     castle_adj = kn[3][4 + len(name.split()) - 1]
     if castle_adj not in castle_adjs:
-#        print("Corrupt input file.")
         return False
-    return [name, age, weapon, castle, , weapon_adj, csatle_adj, char_adj, activity] 
+
+    char_adj = kn[0][-5]
+    if char_adj not in knight_adjs:
+        return False
+
+    activity = ' '.join(kn[2][7 + len(name.split()):])[:-1]
+    if activity not in knight_activities:
+        return False
+
+    return [name, age, weapon, castle, weapon_adj, castle_adj, char_adj, activity] 
 
 
 def retrieve_knights(kns):
@@ -516,7 +517,7 @@ def retrieve_knights(kns):
 def resurrect_knights(file):
     """ Takes a file and returns all the knight entries from that file (which by default is 'dead_knights.txt')
          Also truncates the given file."""
-    retrieve_knights(get_knights(read_knights(file))):
+    retrieve_knights(get_knights(read_knights(file)))
     with open(file, 'w') as f:
         f.truncate()
 
