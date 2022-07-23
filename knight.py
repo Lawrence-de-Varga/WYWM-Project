@@ -1,4 +1,5 @@
 from random import choice
+from decorators import *
 
 ########################## Data for Program ######################################################################
 
@@ -95,13 +96,14 @@ def format_name(name):
 # decorated_func = should_i_exit(objects)(decorated_func) for example with update_knights
 # update_knights = should_i_exit(knights)(update_knights)
 # Which then reduces to update_knights = func_wrapper(update_knights)
+@debug
 def should_i_exit(objects):
     """ A number of functions need to check whether knights or some other dict or list is empty
          and whether they have been passed 'exit' as input by the user, the decorator below
          keeps that code out of those functions"""
     def func_wrapper(function):
         def wrapper(*args, **kwargs):
-            if not objects or 'exit' in args[0]:
+            if not objects or not args[0] or 'exit' in args[0]:
                 return
             else:
                 return function(*args, **kwargs)
@@ -153,7 +155,7 @@ def print_options(options_dict):
         return False
 
     for x, option in options_dict.items():
-        print(f"{x}: {option.capitalize()}")
+        print(f"{x}: {format_name(option)}")
 
     print()
     return options_dict
@@ -181,7 +183,7 @@ def format_input(selection_string):
 
 
 def select_options(options_to_select, object_name, action_name):
-    """ Select_options takes a dictionary of the form returned by gen_options, asks the user to choose an option
+    """ Select_options takes a dictionary of the form returned by print_options, asks the user to choose an option
      or options using either the name of the option or its list number, it then returns a list containing
      all of the options selected in their word form e.g. if the options are {'1':'a','2':'b','3':'c'}
      and the user gives 1 b 3 as input, select_options will return ['a', 'b', 'c'] """
@@ -353,15 +355,14 @@ def gen_knight_desc(name):
     return desc_dict
 
 
-def access_attributes(knight_description, attributes, prn=True):
+def access_attributes(knight_description, attributes):
+    """ Takes a knight-Description and a list of attributes and returns a string comprised of the 
+        values of those attributes from the knight_description dict."""
     description = ''
 
     for attr in attributes:
         description = description + knight_description[attr] + '\n' 
-    if prn:
-        print(description)
-    else:
-        return description
+    return description
 
 
 def select_attrs_to_describe(name):
@@ -369,16 +370,18 @@ def select_attrs_to_describe(name):
     print(f"what would you like to know about {format_name(name)}?")
     attributes = select_options_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
 
-    return access_attributes(knight_descriptions[name], attributes, False)
+    return access_attributes(knight_descriptions[name], attributes)
 
 @should_i_exit(knight_descriptions)
 def describe_knights(selection):
-    """ Calls describe_knight on all the knights in selection."""
+    """ Glues together the description strings returned for each knight by select_attrs_to_describe
+        and prints this larger string once finished."""
     description = ''
     
     for name in selection:
         description = description + f"Let me tell you about {format_name(name)}:\n" +  select_attrs_to_describe(name) + '\n'
-    print(description)
+    return description
+
 
 # Only used for testing, in practice the descriptions will be generated when the knight is created
 def gen_knights_descs():
@@ -393,17 +396,19 @@ def gen_knights_descs():
 def knight_to_file(file, knight_description):
     """ Used to save the descriptions of a knight to a file. """
     with open(file, 'a') as f:
-        f.write(access_knight_description(knight_description, False))
+        for string in knight_description.values():
+            f.write(string)
+            f.write('\n')
         f.write('\n')
 
 
+@debug
 @should_i_exit(knights)
 def knights_to_file(selection, file):
     """ Writes an arbitrary selection of knights to a file"""
     for name in selection:
+        glorious_scrolls.append(name)
         knight_to_file(file, knight_descriptions[name])
-        if name not in glorious_scrolls:
-            glorious_scrolls.append(name)
 
 
 ##################################### Removing Knights from File ##############################################
