@@ -353,48 +353,32 @@ def gen_knight_desc(name):
     return desc_dict
 
 
-def access_knight_description(knight_description, prn=True):
-    """ By default prints the full knight description, pass False to return the description."""
-    format_string = ""
-    for attr in knight_description.values():
-        format_string += attr + "\n"
+def access_attributes(knight_description, attributes, prn=True):
+    description = ''
+
+    for attr in attributes:
+        description = description + knight_description[attr] + '\n' 
     if prn:
-        print(format_string)
+        print(description)
     else:
-        return format_string
+        return description
 
 
-def access_attribute(knight_description, attribute, prn=True):
-    """ By deafult print a single line from a knight description, pass False to return."""
-    if prn:
-        print(knight_description[attribute])
-        print()
-    else:
-        return knight_description[attribute]
-
-
-def describe_knight(name):
+def select_attrs_to_describe(name):
     """ Allows the user to select which attributes of a knight to describe."""
-    print(f"Describing: {format_name(name)}")
+    print(f"what would you like to know about {format_name(name)}?")
     attributes = select_options_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
-    description = []
-    if 'exit' in attributes:
-        return
-    if {'character', 'weapon', 'activities', 'castle'} == set(attributes):
-        return access_knight_description(knight_descriptions[name])
-    else:
-        for attr in attributes:
-            print(f"{format_name(name)}'s {attr}:")
-            access_attribute(knight_descriptions[name], attr)
 
+    return access_attributes(knight_descriptions[name], attributes, False)
 
 @should_i_exit(knight_descriptions)
 def describe_knights(selection):
     """ Calls describe_knight on all the knights in selection."""
+    description = ''
     
     for name in selection:
-        describe_knight(name)
-
+        description = description + f"Let me tell you about {format_name(name)}:\n" +  select_attrs_to_describe(name) + '\n'
+    print(description)
 
 # Only used for testing, in practice the descriptions will be generated when the knight is created
 def gen_knights_descs():
