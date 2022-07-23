@@ -517,9 +517,9 @@ def retrieve_knights(kns):
 def resurrect_knights(file):
     """ Takes a file and returns all the knight entries from that file (which by default is 'dead_knights.txt')
          Also truncates the given file."""
-    retrieve_knights(get_knights(read_knights(file)))
-    with open(file, 'w') as f:
-        f.truncate()
+    if retrieve_knights(get_knights(read_knights(file))):
+        with open(file, 'w') as f:
+            f.truncate()
 
 
 #################################################### Main Menu #################################################
