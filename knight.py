@@ -357,7 +357,7 @@ def describe_knights(selection):
     
     for name in selection:
         description = description + f"Let me tell you about {format_name(name)}:\n" +  select_attrs_to_describe(name) + '\n'
-    return description
+    print(description)
 
 
 # Only used for testing, in practice the descriptions will be generated when the knight is created
