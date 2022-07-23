@@ -90,28 +90,6 @@ def format_name(name):
     return ' '.join(new_name)
 
 
-####################################### Decorator Functions ###################################################
-
-# NOTE for myself applying should_i_exit to a function with the @should_i_exit syntax is equivalent to 
-# decorated_func = should_i_exit(objects)(decorated_func) for example with update_knights
-# update_knights = should_i_exit(knights)(update_knights)
-# Which then reduces to update_knights = func_wrapper(update_knights)
-def should_i_exit(objects):
-    """ A number of functions need to check whether knights or some other dict or list is empty
-         and whether they have been passed 'exit' as input by the user, the decorator below
-         keeps that code out of those functions"""
-    def func_wrapper(function):
-        def wrapper(*args, **kwargs):
-            if not objects or not args[0] or 'exit' in args[0]:
-                return
-            else:
-                return function(*args, **kwargs)
-
-        return wrapper
-
-    return func_wrapper
-
-
 ############################################ Menu Presentation and Selection #################################
 
 def first_word(string):
