@@ -480,43 +480,45 @@ def retrieve_details(kn):
     castle = ' '.join(kn[3][8 + len(name.split()) - 1:]).split('.')[0]
     weapon = ' '.join(kn[1][6:])[:-1]
     char_adj = kn[0][-5]
-#    if char_adj not in knight_adjs:
+    if char_adj not in knight_adjs:
 #        print("Corrupt input file.")
-#        return False
+        return False
     weapon_adj = kn[1][5]
-#    if weapon_adj not in weapon_adjs:
+    if weapon_adj not in weapon_adjs:
 #        print("Corrupt input file.")
-#        return False
+        return False
     activity = ' '.join(kn[2][7 + len(name.split()):])[:-1]
-#    if activity not in knight_activities:
+    if activity not in knight_activities:
 #        print("Corrupt input file.")
-#        return False
+        return False
     castle_adj = kn[3][4 + len(name.split()) - 1]
-#    if castle_adj not in castle_adjs:
+    if castle_adj not in castle_adjs:
 #        print("Corrupt input file.")
-#        return False
-
-    knights[name] = {'age': age, 'weapon': weapon, 'castle': castle,
-                     'adjs': [weapon_adj, castle_adj, char_adj, activity]}
-    knight_descriptions[name] = gen_knight_desc(name)
+        return False
+    return [name, age, weapon, castle, , weapon_adj, csatle_adj, char_adj, activity] 
 
 
 def retrieve_knights(kns):
     """ Takes the list from get_knights and extracts the details needed to generate entries for 'knights',
          and 'knight_descriptions' by using retrieve_details as above."""
     for name in kns:
-        retrieve_details(name)
-#    return knights
+        result = retrieve_details(name)
+        if result:
+            knights[result[0]] = {'age': result[1], 'weapon': result[2], 'castle': result[3],
+                             'adjs': [result[4], result[5], result[6], result[7]]}
+            knight_descriptions[result[0]] = gen_knight_desc(result[0])
+        else:
+            print("Corrupt Input File.")
+            return False
+            
 
 
 def resurrect_knights(file):
     """ Takes a file and returns all the knight entries from that file (which by default is 'dead_knights.txt')
          Also truncates the given file."""
-    if retrieve_knights(get_knights(read_knights(file))):
-        with open(file, 'w') as f:
-            f.truncate()
-    else:
-        return
+    retrieve_knights(get_knights(read_knights(file))):
+    with open(file, 'w') as f:
+        f.truncate()
 
 
 #################################################### Main Menu #################################################
