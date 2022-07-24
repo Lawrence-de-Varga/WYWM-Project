@@ -191,7 +191,7 @@ def select_options(options_to_select, object_name, action_name):
         else:
             print("Bad input.")
             return select_options(options_to_select, object_name, action_name)
-    #    print(f"Options to return: {options_to_return}")
+
     return options_to_return
 
 
@@ -215,59 +215,69 @@ def select_knight(action):
 
 ####################################### Knight Options #######################################################
 
-def knight_details(name):
-    """ Collects the basic details and generates the description of a knight:"""
-    knights[name] = {}
+def set_knight_name():
+    return prompt("Please enter a name for the knight:").lower()
 
-    age = prompt(f'How old is {format_name(name)}?')
+
+def set_knight_age(name):
+    age = prompt(f"How old is {format_name(name)}?")
+
     try:
         int(age)
-        knights[name]['age'] = age
     except ValueError:
-        print("Please enter an integer for the age.")
-        return knight_details(name)
+        print("Please enter a positive integer for the age.")
+        return get_knight_age(name)
+    return str(abs(int(age)))
 
-    weapon = prompt(f'What weapon does {format_name(name)} favour?').lower()
-    knights[name]['weapon'] = weapon
 
-    castle = prompt(f"What is the name of {format_name(name)}'s castle?")
-    knights[name]['castle'] = castle
+def set_knight_weapon(name):
+    return prompt(f"What weapon does {format_name(name)} favour?")
 
-    # sets an unchanging group of adjectives used to enliven the descriptions of the knight
-    knights[name]['adjs'] = [choice(weapon_adjs), choice(castle_adjs),
-                             choice(list(knight_adjs.keys()))]
 
-    # The knight activity is added after the other character attributes have been chosen
-    # because the possible activity is dependent on the chosen character attribute.
-    # knights[name]['adjs'][2] references the character attribute chosen above
-    knights[name]['adjs'].append(choice(knight_adjs[knights[name]['adjs'][2]]))
+def set_knight_castle(name):
+    return prompt(f"What is the name of {format_name(name)}'s castle?")
 
+
+def set_knight_adjs(name):
+    knights[name]['adjs'] = [choice(weapon_adjs), choice(castle_adjs), choice(list(knight_adjs.keys()))]
+    return knights[name]['adjs'] + [choice(knight_adjs[knights[name]['adjs'][2]])]
+
+set_attr_func_dict = {'age': set_knight_age, 'weapon' : set_knight_weapon,
+                      'castle' : set_knight_castle, 'adjs' : set_knight_adjs}
+
+
+def set_knight_attrs(selection, name):
+    
+    for attr in selection:
+        knights[name][attr] = (set_attr_func_dict[attr])(name)
     knight_descriptions[name] = gen_knight_desc(name)
 
 
 def create_knight():
     """ Create a new entry in the 'knights' dict"""
+
     print("Let's make a knight")
-    # Names are stored in lowercase
-    name = prompt("Please enter the knights name:").lower()
+    name = set_knight_name()
 
     if name in knights:
         print(f"{format_name(name)} is already a knight.")
-        selection = select_options_wrap([f'overwrite {format_name(name)}', f'update {format_name(name)}'], 'action', 'take',
+        selection = select_options_wrap(['overwrite', 'update'], 'action', 'take',
                             every=False)
+        print(selection)
         if 'overwrite' in selection:
             knights[name] = {}
-            knight_details(name)
-
+            set_knight_attrs(list(set_attr_func_dict.keys()), name)
         elif 'update' in selection:
             update_knight(name)
         else:
             return
     else:
-        knight_details(name)
+        knights[name] = {}
+        set_knight_attrs(list(set_attr_func_dict.keys()), name)
 
 
 def update_knight(name):
+
     """ Updates an individual knight, and generates a new description,"""
     print(f"Updating {format_name(name)}.")
     attrs = select_options_wrap(['name', 'age', 'weapon', 'castle'], 'attributes', 'update', 'knight')
@@ -276,22 +286,14 @@ def update_knight(name):
         return
 
     if 'name' in attrs:
-        new_name = prompt(f"What would you like {format_name(name)}'s new name to be?")
+        new_name = set_knight_name() 
         knights[new_name] = knights[name]
         knights.pop(name)
         knight_descriptions.pop(name)
-        name = new_name
-
-    for attr in attrs:
-        if attr == 'name':
-            continue
-        new_val = prompt(f"What would you like {format_name(name)}'s new {attr} to be?")
-
-        knights[name][attr] = new_val
-
-    knight_descriptions[name] = gen_knight_desc(name)
-    return name
-
+        set_knight_attrs([attr for attr in attrs if attr != 'name'], new_name)
+    else:
+        set_knight_attrs(attrs, name)
+    
 
 @should_i_exit(knights)
 def update_knights(selection):
