@@ -1,6 +1,9 @@
 from random import choice
 from decorators import *
 
+# split this into different files, one for handling the program loop
+# another for the night methods and knight data, etc. Much easier to keep track of everything
+
 ########################## Data for Program ######################################################################
 
 # Knights for testing
@@ -52,6 +55,16 @@ knight_adjs = {'noble': select_activities(0, 1, 2, 4, 5, 9, 10, 11, 12, 15, 16, 
                'circumspect': select_activities(0, 1, 2, 4, 5, 6, 8, 9, 10, 13, 14, 15, 16, 17, 18)
                }
 
+# ok this is terrifyijng! Keeping track of numbers is really hard. I would suggest instead something like
+
+HUNTING = 'hunting'
+PRAYING = 'praying to god'
+knight_activities = [HUNTING, PRAYING]
+knight_adjs = {
+    'noble': [PRAYING], 
+    'loyal': [HUNTING, PRAYING]
+}
+
 knight_descriptions = {}
 glorious_scrolls = []
 
@@ -72,11 +85,12 @@ def set_article(adjective):
         return f"a {adjective}"
 
 
+# this comment below seems misplaced
 # Takes a name like 'albert the great' and returns 'Albert the Great'
 # NOTE articles_and_others is not necessarily complete  
 articles_and_others = ['the', 'a', 'an', 'and', 'on', 'in', 'of', 'some', 'from']
 
-
+# I like this function, does one thing, nice and self contained.  
 def format_name(name):
     """ Takes a name and capitalizes every word not in articules_and_others. E.g.
         'albert the great' is returned as 'Albert the Great'."""
@@ -215,6 +229,7 @@ def select_knight(action):
 
 ####################################### Knight Options #######################################################
 
+# i would call this "promp knight name" but meh
 def set_knight_name():
     return prompt("Please enter a name for the knight:").lower()
 
@@ -226,16 +241,15 @@ def set_knight_age(name):
         int(age)
     except ValueError:
         print("Please enter a positive integer for the age.")
+        # this function does not exist according to my linter
         return get_knight_age(name)
     return str(abs(int(age)))
 
 def set_knight_weapon(name):
     return prompt(f"What weapon does {format_name(name)} favour?")
 
-
 def set_knight_castle(name):
     return prompt(f"What is the name of {format_name(name)}'s castle?")
-
 
 def set_knight_adjs(name):
     knights[name]['adjs'] = [choice(weapon_adjs), choice(castle_adjs), choice(list(knight_adjs.keys()))]
@@ -264,6 +278,10 @@ def create_knight():
                             every=False)
         print(selection)
         if 'overwrite' in selection:
+            # knights[name] = {} should be done inside the "set_knight_attrs" function, since
+            # it has to happen every time and if we leave it out we might forget it once and
+            # cause a bug. Alternatively make a new funcitn set_new_knight_attrs() which calls 
+            # these two lines below
             knights[name] = {}
             set_knight_attrs(list(set_attr_func_dict.keys()), name)
         elif 'update' in selection:
@@ -372,6 +390,19 @@ def gen_knights_descs():
 ####################################### Writing Knights to File ###############################################
 
 def knight_to_file(file, knight_description):
+    # I would use the python JSON library here
+    # e.g.
+
+    import json
+    with open(file, 'w') as f:
+        json.dump(knight_description, f)
+    
+    # then to load it again
+
+    with open(file, 'w') as f:
+        knight_description = json.load(f)
+    
+
     """ Used to save the descriptions of a knight to a file. """
     with open(file, 'a') as f:
         for string in knight_description.values():
@@ -507,10 +538,21 @@ def menu():
 
     action = select_options(options, 'action', 'take')
 
+    # you keep using "action[0]" assign this to a variable and just use that variable
+    # easier to type and ever so slightly more resource efficient
+
     # action[0] is used to prevent multiple options being selected as in other menus.
     if action[0] == 'create':
         create_knight()
-        menu()
+        menu() # don't use recursivity to mange this. Python has a maximum recursivity depth 
+        # if the user reaches this the program will crash stead do
+        running = True
+        while running:
+            # blah blah blah
+            if action[0] == 'exit':
+                print('fuck off')
+                running = False
+
     elif action[0] == 'update':
         update_knights(select_knight('update'))
         menu()
@@ -533,6 +575,7 @@ def menu():
     elif action[0] == 'exit':
         print("Goodbye.")
     else:
+        # helpful to print the bad input here as wall maybe
         print("Bad input.")
         menu()
 
