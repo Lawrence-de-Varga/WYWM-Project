@@ -229,7 +229,6 @@ def set_knight_age(name):
         return get_knight_age(name)
     return str(abs(int(age)))
 
-
 def set_knight_weapon(name):
     return prompt(f"What weapon does {format_name(name)} favour?")
 
