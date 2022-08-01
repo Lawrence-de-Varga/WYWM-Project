@@ -14,17 +14,16 @@ weapon_adjs = ['trusty', 'venerable', 'vicious', 'blood-thirsty', 'gleaming', 'r
 
 castle_adjs = ['glorious', 'decrepit', 'impenetrable', 'foreboding', 'lavish', 'luxuriant', 'gargantuan']
 
-knight_activities = ['taxing the peasants', 'feasting', 'training for war', 'raping and pillaging',
-                     'deep in prayer', 'entertaining nobles', 'seducing the ladies of the court',
-                     'drunkenly brawling', 'drunkenly reveling', 'plotting and scheming',
-                     'scheming and plotting', 'jousting', 'hunting', 'whoremongering',
-                     'overtaxing the peasants', 'deep in thought', 'consumed in reading',
-                     'dispensing justice', 'dispensing injustice']
-
+knight_activities = {1 : 'taxing the peasants', 2 : 'feasting', 3 : 'training for war', 4 : 'raping and pillaging',
+        5 : 'deep in prayer', 6 : 'entertaining nobles', 7 : 'seducing the ladies of the court',
+        8 : 'drunkenly brawling', 9 : 'drunkenly reveling', 10 : 'plotting and scheming',
+        11 : 'scheming and plotting', 12 : 'jousting', 13 : 'hunting', 14 : 'whoremongering',
+        15 : 'overtaxing the peasants', 16 : 'deep in thought', 17 : 'consumed in reading',
+        18 : 'dispensing justice', 19 : 'dispensing injustice'} 
 
 def select_activities(*args):
     """Used to generate lists of activities which are compatible with particular knight_adjs"""
-    return [activity for x, activity in enumerate(knight_activities) if x in args]
+    return [activity for x, activity in knight_activities.items() if x in args]
 
 
 # The following could be simplified by creating a few select groups to go with
@@ -190,6 +189,7 @@ def select_options(options_to_select, object_name, action_name):
             options_to_return.append(option)
         else:
             print("Bad input.")
+            print(f"This is what you input: {selection}")
             return select_options(options_to_select, object_name, action_name)
 
     return options_to_return
@@ -226,7 +226,7 @@ def set_knight_age(name):
         int(age)
     except ValueError:
         print("Please enter a positive integer for the age.")
-        return get_knight_age(name)
+        return set_knight_age(name)
     return str(abs(int(age)))
 
 
@@ -492,52 +492,51 @@ def resurrect_knights(file):
 #################################################### Main Menu #################################################
 
 def menu():
-    """ Present the main menu to the user."""
-    menu_ops = ['create a knight', 'update some knights', 'describe some knights',
-                'execute some knights', 'record some grand knights in the scrolls',
-                'erase some troublesome knights from the scrolls', 'resurrect knights from the dead']
-    print()
-    print('########## MAIN MENU ##########')
-    print()
+    run = True
+    while run:
+        """ Present the main menu to the user."""
+        menu_ops = ['create a knight', 'update some knights', 'describe some knights',
+                    'execute some knights', 'record some grand knights in the scrolls',
+                    'erase some troublesome knights from the scrolls', 'resurrect knights from the dead']
+        print()
+        print('########## MAIN MENU ##########')
+        print()
 
-    # select_options_wrap is not used as we need to modify the presented options before
-    # they select one.
-    options = print_options(gen_options(menu_ops, 'action', 'take', every=False))
-    for num, option in options.items():
-        options[num] = first_word(option)
+        # select_options_wrap is not used as we need to modify the presented options before
+        # they select one.
+        options = print_options(gen_options(menu_ops, 'action', 'take', every=False))
+        for num, option in options.items():
+            options[num] = first_word(option)
 
-    action = select_options(options, 'action', 'take')
+        actions = select_options(options, 'action', 'take')
 
-    # action[0] is used to prevent multiple options being selected as in other menus.
-    if action[0] == 'create':
-        create_knight()
-        menu()
-    elif action[0] == 'update':
-        update_knights(select_knight('update'))
-        menu()
-    elif action[0] == 'describe':
-        describe_knights(select_knight('describe'))
-        menu()
-    elif action[0] == 'execute':
-        delete_knights(select_knight('execute'))
-        menu()
-    elif action[0] == 'record':
-        knights_to_file(select_options_wrap([knight for knight in knights if knight not in glorious_scrolls], 'knight',
-                                'record in the scrolls'), 'knights.txt')
-        menu()
-    elif action[0] == 'erase':
-        erase_knights(select_options_wrap(glorious_scrolls, 'knight', 'erase from the scrolls'))
-        menu()
-    elif action[0] == 'resurrect':
-        resurrect_knights('dead_knights.txt')
-        menu()
-    elif action[0] == 'exit':
-        print("Goodbye.")
-    else:
-        print("Bad input.")
-        menu()
+        for act in actions: 
+            if act == 'create':
+                create_knight()
+            elif act == 'update':
+                update_knights(select_knight('update'))
+            elif act == 'describe':
+                describe_knights(select_knight('describe'))
+            elif act == 'execute':
+                delete_knights(select_knight('execute'))
+            elif act == 'record':
+                knights_to_file(select_options_wrap([knight for knight in knights if knight not in glorious_scrolls], 'knight',
+                                        'record in the scrolls'), 'knights.txt')
+            elif act == 'erase':
+                erase_knights(select_options_wrap(glorious_scrolls, 'knight', 'erase from the scrolls'))
+            elif act == 'resurrect':
+                resurrect_knights('dead_knights.txt')
+            elif act == 'exit':
+                print("Goodbye.")
+                run = False
 
 
 # gen_knights_descs() is only for testing
 gen_knights_descs()
+
 menu()
+
+
+
+
+
