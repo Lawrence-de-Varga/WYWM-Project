@@ -1,14 +1,14 @@
 from random import choice
-from decorators import *
 
 ########################## Data for Program ######################################################################
 
 # Knights for testing
-knights = {'john': {'age': '23', 'weapon': 'mace', 'castle': 'london',
-                    'adjs': ['trusty', 'foreboding', 'impoverished', 'whoremongering']},
-           'james': {'age': '24', 'weapon': 'lance', 'castle': 'paris',
-                     'adjs': ['venerable', 'decrepit', 'loyal', 'hunting']}}
-#knights = {}
+#knights = {'john': {'age': '23', 'weapon': 'mace', 'castle': 'london',
+#                    'adjs': ['trusty', 'foreboding', 'impoverished', 'whoremongering']},
+#           'james': {'age': '24', 'weapon': 'lance', 'castle': 'paris',
+#                     'adjs': ['venerable', 'decrepit', 'loyal', 'hunting']}}
+
+knights = {}
 
 weapon_adjs = ['trusty', 'venerable', 'vicious', 'blood-thirsty', 'gleaming', 'rusty', 'notched']
 
@@ -54,6 +54,26 @@ knight_adjs = {'noble': select_activities(0, 1, 2, 4, 5, 9, 10, 11, 12, 15, 16, 
 knight_descriptions = {}
 glorious_scrolls = []
 
+################################### Decorator #############################################################
+
+# NOTE for myself applying should_i_exit to a function with the @should_i_exit syntax is equivalent to 
+# decorated_func = should_i_exit(objects)(decorated_func) for example with update_knights
+# update_knights = should_i_exit(knights)(update_knights)
+# Which then reduces to update_knights = func_wrapper(update_knights)
+def should_i_exit(objects):
+    """ A number of functions need to check whether knights or some other dict or list is empty
+         and whether they have been passed 'exit' as input by the user, the decorator below
+         keeps that code out of those functions"""
+    def func_wrapper(function):
+        def wrapper(*args, **kwargs):
+            if not objects or not args[0] or 'exit' in args[0]:                            
+                return
+            else:
+                return function(*args, **kwargs)
+                                                                                                                  
+        return wrapper
+
+    return func_wrapper
 
 ################################################ Text helper functions #########################################
 
@@ -71,10 +91,8 @@ def set_article(adjective):
         return f"a {adjective}"
 
 
-# Takes a name like 'albert the great' and returns 'Albert the Great'
 # NOTE articles_and_others is not necessarily complete  
 articles_and_others = ['the', 'a', 'an', 'and', 'on', 'in', 'of', 'some', 'from']
-
 
 def format_name(name):
     """ Takes a name and capitalizes every word not in articules_and_others. E.g.
@@ -95,11 +113,6 @@ def first_word(string):
      """ Used to retrieve the first string from a menu option presented to the user. This string is then checked
          against the user input to see what option they have chosen."""
      return string.split(' ', 1)[0]
-
-
-def first_words(options):
-    """ Used to transform an entire list of options selected by the user according to first_word()"""
-    return [first_word(option) for option in options]
 
 
 def gen_options_dict(range_of_dict, options):
@@ -162,7 +175,7 @@ def select_options(options_to_select, object_name, action_name):
     """ Select_options takes a dictionary of the form returned by print_options, asks the user to choose an option
      or options using either the name of the option or its list number, it then returns a list containing
      all of the options selected in their word form e.g. if the options are {'1':'a','2':'b','3':'c'}
-     and the user gives 1 b 3 as input, select_options will return ['a', 'b', 'c'] """
+     and the user gives 1, 3, b as input, select_options will return ['a', 'c', 'b'] """
     # Check if there are any options to select from
     if not options_to_select:
         return False
@@ -247,7 +260,7 @@ set_attr_func_dict = {'age': set_knight_age, 'weapon' : set_knight_weapon,
 
 
 def set_knight_attrs(selection, name):
-    
+    """Sets the attributes for a slected knight and selected attributes."""     
     for attr in selection:
         knights[name][attr] = (set_attr_func_dict[attr])(name)
     knight_descriptions[name] = gen_knight_desc(name)
@@ -338,7 +351,6 @@ def access_attributes(knight_description, attributes):
     """ Takes a knight-Description and a list of attributes and returns a string comprised of the 
         values of those attributes from the knight_description dict."""
     description = ''
-
     for attr in attributes:
         description = description + knight_description[attr] + '\n' 
     return description
@@ -348,6 +360,8 @@ def select_attrs_to_describe(name):
     """ Allows the user to select which attributes of a knight to describe."""
     print(f"what would you like to know about {format_name(name)}?")
     attributes = select_options_wrap(['character', 'weapon', 'activities', 'castle'], 'attributes', 'describe')
+    if 'exit' in attributes:
+        return attributes
 
     return access_attributes(knight_descriptions[name], attributes)
 
@@ -357,8 +371,12 @@ def describe_knights(selection):
         and prints this larger string once finished."""
     description = ''
     
+
     for name in selection:
-        description = description + f"Let me tell you about {format_name(name)}:\n" +  select_attrs_to_describe(name) + '\n'
+        desc = select_attrs_to_describe(name)
+        if 'exit' in desc:
+            break
+        description = description + f"Let me tell you about {format_name(name)}:\n" + desc + '\n'
     print(description)
 
 
@@ -417,7 +435,6 @@ def read_knights(file):
     """ Reads in the entire file ('knights.txt') and returns the list."""
     with open(file, 'r') as f:
         return f.readlines()
-#    return kns
 
 
 def get_knights(lines):
@@ -460,7 +477,7 @@ def retrieve_details(kn):
         return False
 
     activity = ' '.join(kn[2][7 + len(name.split()):])[:-1]
-    if activity not in knight_activities:
+    if activity not in knight_activities.values():
         return False
 
     return [name, age, weapon, castle, weapon_adj, castle_adj, char_adj, activity] 
@@ -478,15 +495,20 @@ def retrieve_knights(kns):
         else:
             print("Corrupt Input File.")
             return False
+    return True
             
 
 
 def resurrect_knights(file):
     """ Takes a file and returns all the knight entries from that file (which by default is 'dead_knights.txt')
          Also truncates the given file."""
-    if retrieve_knights(get_knights(read_knights(file))):
-        with open(file, 'w') as f:
-            f.truncate()
+    try:
+        if retrieve_knights(get_knights(read_knights(file))):
+            with open(file, 'w') as f:
+                f.truncate()
+    except FileNotFoundError:
+        print("There are no knights to resurrect.")
+        return
 
 
 #################################################### Main Menu #################################################
@@ -532,7 +554,7 @@ def menu():
 
 
 # gen_knights_descs() is only for testing
-gen_knights_descs()
+#gen_knights_descs()
 
 menu()
 
